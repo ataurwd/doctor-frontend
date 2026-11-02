@@ -1,28 +1,100 @@
+import fallbackData from '../data/fallbackData.js';
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 const API_SECRET = process.env.API_SECRET_KEY || 'sajib-api-shield-9f4a8b1c7e2d6305a4f78e1b52a1c0de';
 const CLIENT_TOKEN = process.env.NEXT_PUBLIC_APP_CLIENT_TOKEN || 'sajib-client-handshake-2026';
 
-export async function fetchApi(endpoint, options = {}) {
-  const url = `${API_BASE}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
-  const res = await fetch(url, {
-    cache: 'no-store',
-    ...options,
-    headers: {
-      'x-api-secret': API_SECRET,
-      'x-app-client': CLIENT_TOKEN,
-      'x-requested-with': 'XMLHttpRequest',
-      ...(options.headers || {}),
-    },
-  });
-  if (!res.ok) {
-    if (res.status === 404) return null;
-    throw new Error(`API error ${res.status} on ${endpoint}`);
+function getFallbackForEndpoint(endpoint) {
+  const clean = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+
+  if (clean === '/bootstrap') {
+    return fallbackData;
   }
-  return res.json();
+  if (clean === '/specialities') {
+    return fallbackData.specialities || [];
+  }
+  if (clean.startsWith('/specialities/')) {
+    const slug = clean.replace('/specialities/', '');
+    const item = (fallbackData.specialities || []).find((s) => s.slug === slug);
+    const others = (fallbackData.specialities || [])
+      .filter((s) => s.slug !== slug)
+      .slice(0, 3)
+      .map((s) => ({ slug: s.slug, title: s.title, summary: s.summary }));
+    return item ? { item, others } : null;
+  }
+  if (clean === '/services') {
+    return fallbackData.specialServices || [];
+  }
+  if (clean.startsWith('/services/')) {
+    const slug = clean.replace('/services/', '');
+    const item = (fallbackData.specialServices || []).find((s) => s.slug === slug);
+    const others = (fallbackData.specialServices || [])
+      .filter((s) => s.slug !== slug)
+      .slice(0, 3)
+      .map((s) => ({ slug: s.slug, title: s.title, summary: s.summary }));
+    return item ? { item, others } : null;
+  }
+  if (clean === '/chambers') {
+    return fallbackData.chambers || [];
+  }
+  if (clean === '/patient-education') {
+    return {
+      posts: fallbackData.allPosts || fallbackData.latestPosts || [],
+      categories: fallbackData.categories || [],
+      handouts: [],
+    };
+  }
+  if (clean.startsWith('/patient-education/')) {
+    const slug = clean.replace('/patient-education/', '');
+    const posts = fallbackData.allPosts || fallbackData.latestPosts || [];
+    const item = posts.find((p) => p.slug === slug);
+    const related = posts.filter((p) => p.slug !== slug).slice(0, 2);
+    return item ? { item, related, categories: fallbackData.categories || [] } : null;
+  }
+  return null;
+}
+
+export async function fetchApi(endpoint, options = {}) {
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = `${API_BASE}${cleanEndpoint}`;
+
+  try {
+    const res = await fetch(url, {
+      cache: 'no-store',
+      ...options,
+      headers: {
+        'x-api-secret': API_SECRET,
+        'x-app-client': CLIENT_TOKEN,
+        'x-requested-with': 'XMLHttpRequest',
+        ...(options.headers || {}),
+      },
+    });
+
+    if (res.ok) {
+      return await res.json();
+    }
+
+    if (res.status === 404) {
+      return getFallbackForEndpoint(cleanEndpoint);
+    }
+  } catch (err) {
+    // If backend is unreachable (e.g. during Vercel SSR before backend deployment)
+    // graceful fallback prevents 500 server crash and serves complete static medical data
+    console.warn(`[API Info] Live API unreachable on ${cleanEndpoint} (${err.message}). Using local embedded store.`);
+    return getFallbackForEndpoint(cleanEndpoint);
+  }
+
+  return getFallbackForEndpoint(cleanEndpoint);
 }
 
 export async function getBootstrapData() {
-  return fetchApi('/bootstrap');
+  try {
+    const data = await fetchApi('/bootstrap');
+    if (data && data.doctor) return data;
+  } catch (e) {
+    console.warn('[API Warning] getBootstrapData fallback triggered:', e.message);
+  }
+  return fallbackData;
 }
 
 function escapeHtml(str) {
