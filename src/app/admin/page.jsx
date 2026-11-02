@@ -162,6 +162,8 @@ export default function AdminPanelPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
   const [editingItem, setEditingItem] = useState(null);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
+  const [pdfPreviewTitle, setPdfPreviewTitle] = useState('');
   const [settingsForm, setSettingsForm] = useState({});
   const [toast, setToast] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -569,6 +571,70 @@ export default function AdminPanelPage() {
         <div className="fixed right-6 top-6 z-50 rounded-2xl bg-teal px-5 py-3.5 text-sm font-bold text-white shadow-xl animate-fade-in flex items-center gap-2.5">
           <SiteIcon name="check" className="size-4 text-accent" />
           <span>{toast}</span>
+        </div>
+      )}
+
+      {/* PDF Document Preview Modal */}
+      {pdfPreviewUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-5xl rounded-3xl bg-white border border-line shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+            {/* Modal Top Bar */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-line bg-paper-alt/60">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white font-black text-xs shadow-xs">
+                  PDF
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-base font-bold text-ink truncate">
+                    {pdfPreviewTitle || 'Printable Patient Guide / Handout'}
+                  </h3>
+                  <p className="text-xs font-mono text-ink-soft truncate">{pdfPreviewUrl}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <a
+                  href={pdfPreviewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-xl border border-line bg-white px-3 py-1.5 text-xs font-bold text-teal hover:bg-teal hover:text-white transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                  title="Open in new browser window to print"
+                >
+                  <SiteIcon name="arrow-up-right" className="size-3.5" />
+                  <span>Open & Print</span>
+                </a>
+
+                <a
+                  href={pdfPreviewUrl}
+                  download
+                  className="rounded-xl bg-teal px-3.5 py-1.5 text-xs font-bold text-white hover:bg-teal-deep transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                >
+                  <SiteIcon name="download" className="size-3.5" />
+                  <span>Download</span>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPdfPreviewUrl(null);
+                    setPdfPreviewTitle('');
+                  }}
+                  className="flex size-8 items-center justify-center rounded-xl border border-line bg-white text-ink-soft hover:bg-paper-alt cursor-pointer ml-1"
+                >
+                  <SiteIcon name="close" className="size-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Embedded PDF iframe viewer */}
+            <div className="flex-1 p-3 bg-paper-alt/20 min-h-[520px]">
+              <iframe
+                src={pdfPreviewUrl}
+                className="w-full h-full min-h-[550px] rounded-2xl border border-line/80 bg-white shadow-inner"
+                title="PDF Document"
+              />
+            </div>
+          </div>
         </div>
       )}
 
@@ -1438,6 +1504,29 @@ export default function AdminPanelPage() {
                                   })
                                 }
                               />
+                              {f.key === 'file_path' && editingItem.file_path && (
+                                <div className="mt-2 flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setPdfPreviewUrl(editingItem.file_path);
+                                      setPdfPreviewTitle(editingItem.title?.en || 'Handout PDF');
+                                    }}
+                                    className="rounded-lg bg-teal/10 px-2.5 py-1 text-xs font-bold text-teal hover:bg-teal hover:text-white transition-all cursor-pointer inline-flex items-center gap-1.5"
+                                  >
+                                    <SiteIcon name="search" className="size-3" />
+                                    <span>Test & Preview Current PDF</span>
+                                  </button>
+                                  <a
+                                    href={editingItem.file_path}
+                                    download
+                                    className="rounded-lg bg-paper-alt px-2.5 py-1 text-xs font-bold text-ink hover:bg-teal hover:text-white transition-all cursor-pointer inline-flex items-center gap-1.5"
+                                  >
+                                    <SiteIcon name="download" className="size-3" />
+                                    <span>Download</span>
+                                  </a>
+                                </div>
+                              )}
                             </div>
                           );
                         })}
@@ -1630,6 +1719,71 @@ export default function AdminPanelPage() {
                                     </p>
                                   )}
 
+                                  {/* Handout PDF Document Box with Preview, Download & Print */}
+                                  {item.file_path && (
+                                    <div className="mt-4 rounded-2xl border border-red-200/90 bg-red-50/60 p-3.5 flex items-center justify-between gap-3 shadow-2xs">
+                                      <div className="flex items-center gap-2.5 min-w-0">
+                                        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white font-black text-xs shadow-xs">
+                                          PDF
+                                        </div>
+                                        <div className="min-w-0">
+                                          <p className="text-xs font-bold text-ink truncate font-mono">
+                                            {item.file_path.split('/').pop()}
+                                          </p>
+                                          <p className="text-[11px] text-ink-soft truncate font-mono">{item.file_path}</p>
+                                        </div>
+                                      </div>
+
+                                      <div className="flex items-center gap-1.5 shrink-0">
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setPdfPreviewUrl(item.file_path);
+                                            setPdfPreviewTitle(enTitle);
+                                          }}
+                                          className="rounded-xl bg-white border border-line px-2.5 py-1.5 text-xs font-bold text-teal hover:bg-teal hover:text-white transition-all cursor-pointer shadow-2xs"
+                                          title="Preview PDF Viewer"
+                                        >
+                                          Preview
+                                        </button>
+
+                                        <a
+                                          href={item.file_path}
+                                          download
+                                          className="rounded-xl bg-white border border-line p-1.5 text-ink-soft hover:text-teal hover:border-teal transition-all shadow-2xs cursor-pointer"
+                                          title="Download PDF File"
+                                        >
+                                          <SiteIcon name="download" className="size-3.5" />
+                                        </a>
+
+                                        <a
+                                          href={item.file_path}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="rounded-xl bg-white border border-line p-1.5 text-ink-soft hover:text-teal hover:border-teal transition-all shadow-2xs cursor-pointer"
+                                          title="Open in Tab to Print"
+                                        >
+                                          <SiteIcon name="arrow-up-right" className="size-3.5" />
+                                        </a>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Linked Article Slug for Handouts */}
+                                  {item.post_slug && (
+                                    <div className="mt-3 text-xs text-ink-soft flex items-center gap-1.5">
+                                      <span className="font-semibold text-ink">Linked Article:</span>
+                                      <Link
+                                        href={`/en/patient-education/${item.post_slug}`}
+                                        target="_blank"
+                                        className="font-mono text-teal font-semibold hover:underline inline-flex items-center gap-1"
+                                      >
+                                        <span>/{item.post_slug}</span>
+                                        <SiteIcon name="arrow-up-right" className="size-3" />
+                                      </Link>
+                                    </div>
+                                  )}
+
                                   {/* Internal Review Note */}
                                   {note && (
                                     <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 p-2.5 text-xs font-semibold text-amber-800 flex items-start gap-2">
@@ -1725,7 +1879,19 @@ export default function AdminPanelPage() {
                                         )}
                                       </td>
                                       <td className="py-4 px-6">
-                                        {item.slug ? (
+                                        {item.file_path ? (
+                                          <div className="flex flex-col gap-1">
+                                            <span className="font-mono text-xs text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-lg inline-flex items-center gap-1.5 w-fit">
+                                              <span className="font-black text-[9px] bg-red-600 text-white px-1 py-0.5 rounded">PDF</span>
+                                              <span>{item.file_path.split('/').pop()}</span>
+                                            </span>
+                                            {item.post_slug && (
+                                              <span className="text-[11px] text-ink-soft">
+                                                Linked: /{item.post_slug}
+                                              </span>
+                                            )}
+                                          </div>
+                                        ) : item.slug ? (
                                           <span className="font-mono text-xs text-teal bg-paper-alt px-2.5 py-1 rounded-lg">
                                             /{item.slug}
                                           </span>
@@ -1763,6 +1929,29 @@ export default function AdminPanelPage() {
                                           >
                                             Edit
                                           </button>
+                                          {item.file_path && (
+                                            <>
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  setPdfPreviewUrl(item.file_path);
+                                                  setPdfPreviewTitle(enTitle);
+                                                }}
+                                                className="rounded-xl border border-line p-1.5 text-teal hover:bg-teal hover:text-white transition-all cursor-pointer shadow-2xs"
+                                                title="Preview PDF Document"
+                                              >
+                                                <SiteIcon name="search" className="size-3.5" />
+                                              </button>
+                                              <a
+                                                href={item.file_path}
+                                                download
+                                                className="rounded-xl border border-line p-1.5 text-ink-soft hover:text-teal hover:border-teal transition-all shadow-2xs cursor-pointer"
+                                                title="Download PDF File"
+                                              >
+                                                <SiteIcon name="download" className="size-3.5" />
+                                              </a>
+                                            </>
+                                          )}
                                           {publicUrl && (
                                             <Link
                                               href={publicUrl}
