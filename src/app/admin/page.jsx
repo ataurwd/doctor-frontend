@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import SiteIcon from '@/components/SiteIcon';
 
@@ -243,36 +243,65 @@ export default function AdminPanelPage() {
     [token]
   );
 
-  // 4. Load Data whenever activeSection or token changes
-  const loadSectionData = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    setLoadError('');
+  const adminCache = useRef(new Map());
 
-    try {
-      // Fetch user profile if not loaded
-      if (!user) {
-        const meRes = await authFetch('/me').catch(() => null);
-        if (meRes?.user) setUser(meRes.user);
-      }
+  // 4. Load Data whenever activeSection or token changes (Optimized with SWR and Parallel Fetching)
+  const loadSectionData = useCallback(
+    async (bypassCache = false) => {
+      if (!token) return;
 
-      if (activeSection === 'dashboard') {
-        const s = await authFetch('/stats');
-        setStats(s || {});
-      } else if (activeSection === 'settings') {
-        const s = await authFetch('/settings');
-        setSettingsForm(s || {});
+      // SWR Pattern: If data is already in client memory, show it instantly (0ms latency!)
+      if (!bypassCache && adminCache.current.has(activeSection)) {
+        const cached = adminCache.current.get(activeSection);
+        if (activeSection === 'dashboard') setStats(cached);
+        else if (activeSection === 'settings') setSettingsForm(cached);
+        else setItems(cached);
+        setLoading(false);
       } else {
-        const list = await authFetch(`/${activeSection}`);
-        setItems(Array.isArray(list) ? list : []);
+        setLoading(true);
       }
-    } catch (err) {
-      console.error('[Admin Data Load Error]:', err);
-      setLoadError(err.message || 'Failed to load section data from server.');
-    } finally {
-      setLoading(false);
-    }
-  }, [token, activeSection, user, authFetch]);
+
+      setLoadError('');
+
+      try {
+        // Parallelize /me with section fetch to eliminate waterfall delay
+        const mePromise = !user ? authFetch('/me').catch(() => null) : Promise.resolve(null);
+        const sectionPromise =
+          activeSection === 'dashboard'
+            ? authFetch('/stats')
+            : activeSection === 'settings'
+            ? authFetch('/settings')
+            : authFetch(`/${activeSection}`);
+
+        const [meRes, resData] = await Promise.all([mePromise, sectionPromise]);
+
+        if (meRes?.user) setUser(meRes.user);
+
+        if (activeSection === 'dashboard') {
+          const s = resData || {};
+          setStats(s);
+          adminCache.current.set('dashboard', s);
+        } else if (activeSection === 'settings') {
+          const s = resData || {};
+          setSettingsForm(s);
+          adminCache.current.set('settings', s);
+        } else {
+          const list = Array.isArray(resData) ? resData : [];
+          setItems(list);
+          adminCache.current.set(activeSection, list);
+        }
+      } catch (err) {
+        console.error('[Admin Data Load Error]:', err);
+        // Only show error banner if we don't already have cached data displayed
+        if (!adminCache.current.has(activeSection)) {
+          setLoadError(err.message || 'Failed to load section data from server.');
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [token, activeSection, user, authFetch]
+  );
 
   useEffect(() => {
     loadSectionData();
@@ -327,7 +356,7 @@ export default function AdminPanelPage() {
     try {
       await authFetch(`/appointment-requests/${id}/mark-called`, { method: 'PATCH' });
       showToast('Marked as called!');
-      loadSectionData();
+      loadSectionData(true);
     } catch (e) {
       showToast('Error: ' + e.message);
     }
@@ -341,7 +370,7 @@ export default function AdminPanelPage() {
       });
       showToast('Appointment updated successfully!');
       setEditingItem(null);
-      loadSectionData();
+      loadSectionData(true);
     } catch (e) {
       showToast('Error updating: ' + e.message);
     }
@@ -350,7 +379,7 @@ export default function AdminPanelPage() {
   const handleToggleMessageRead = async (id) => {
     try {
       await authFetch(`/contact-messages/${id}/toggle-read`, { method: 'PATCH' });
-      loadSectionData();
+      loadSectionData(true);
     } catch (e) {
       showToast('Error: ' + e.message);
     }
@@ -365,6 +394,7 @@ export default function AdminPanelPage() {
         body: JSON.stringify(settingsForm),
       });
       showToast('Settings saved successfully!');
+      loadSectionData(true);
     } catch (e) {
       showToast('Failed to save settings: ' + e.message);
     } finally {
@@ -387,7 +417,7 @@ export default function AdminPanelPage() {
       });
       showToast(isNew ? 'Created successfully!' : 'Saved successfully!');
       setEditingItem(null);
-      loadSectionData();
+      loadSectionData(true);
     } catch (e) {
       showToast('Save failed: ' + e.message);
     } finally {
@@ -400,7 +430,7 @@ export default function AdminPanelPage() {
     try {
       await authFetch(`/${activeSection}/${id}`, { method: 'DELETE' });
       showToast('Item deleted.');
-      loadSectionData();
+      loadSectionData(true);
     } catch (e) {
       showToast('Delete failed: ' + e.message);
     }
@@ -739,7 +769,7 @@ export default function AdminPanelPage() {
 
             <button
               type="button"
-              onClick={loadSectionData}
+              onClick={() => loadSectionData(true)}
               title="Refresh Data"
               className="flex size-9 items-center justify-center rounded-xl border border-line bg-white text-ink-soft hover:text-teal hover:border-teal transition-all cursor-pointer shadow-2xs"
             >

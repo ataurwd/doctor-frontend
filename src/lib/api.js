@@ -74,8 +74,12 @@ export async function fetchApi(endpoint, options = {}) {
   const url = `${API_BASE}${cleanEndpoint}`;
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+
     const res = await fetch(url, {
       next: { revalidate: 60 },
+      signal: controller.signal,
       ...options,
       headers: {
         'x-api-secret': API_SECRET,
@@ -84,6 +88,8 @@ export async function fetchApi(endpoint, options = {}) {
         ...(options.headers || {}),
       },
     });
+
+    clearTimeout(timeoutId);
 
     if (res.ok) {
       const data = await res.json();
