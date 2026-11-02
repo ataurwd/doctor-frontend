@@ -335,7 +335,7 @@ export default async function HomePage({ params }) {
 
                 {/* Title */}
                 <h3 className="mt-6 text-xl sm:text-2xl font-bold tracking-tight text-ink transition-colors duration-200 group-hover:text-teal leading-snug">
-                  <Link href={card.href} className="hover:underline focus:outline-none">
+                  <Link href={card.href} className="no-underline hover:no-underline focus:outline-none">
                     {card.title}
                   </Link>
                 </h3>
