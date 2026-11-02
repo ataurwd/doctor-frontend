@@ -122,7 +122,7 @@ export default async function EducationShowPage({ params }) {
           />
         </article>
 
-        <aside className="no-print space-y-6">
+        <aside className="no-print space-y-6 lg:sticky lg:top-24 self-start">
           {related.length > 0 && (
             <div className="card">
               <h2 className="text-xl font-semibold tracking-[-0.02em]">{t(locale, 'education.related')}</h2>
