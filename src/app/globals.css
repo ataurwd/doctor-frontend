@@ -349,3 +349,8 @@
   display: none;
 }
 
+/* Hide mobile bottom action bar when off-canvas drawer is active */
+body.mobile-menu-open #mobile-bottom-bar {
+  display: none !important;
+}
+

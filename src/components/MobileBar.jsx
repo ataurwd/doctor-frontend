@@ -8,7 +8,7 @@ export default function MobileBar({ locale = 'en', settings = {} }) {
   const isBn = locale === 'bn';
 
   return (
-    <div className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-line/80 bg-white/95 px-3 py-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(27,46,42,0.06)] backdrop-blur-md md:hidden">
+    <div id="mobile-bottom-bar" className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-line/80 bg-white/95 px-3 py-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(27,46,42,0.06)] backdrop-blur-md md:hidden">
       <div className={`grid gap-2.5 items-center ${waUrl ? 'grid-cols-3' : 'grid-cols-2'}`}>
         {callNumber && (
           <a

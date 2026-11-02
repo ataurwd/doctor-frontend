@@ -22,15 +22,18 @@ export default function Header({ locale = 'en', doctor }) {
     setMounted(true);
   }, []);
 
-  // Prevent background scrolling when off-canvas is open
+  // Prevent background scrolling and hide mobile bottom bar when off-canvas is open
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
+      document.body.classList.add('mobile-menu-open');
     } else {
       document.body.style.overflow = '';
+      document.body.classList.remove('mobile-menu-open');
     }
     return () => {
       document.body.style.overflow = '';
+      document.body.classList.remove('mobile-menu-open');
     };
   }, [open]);
 
@@ -61,36 +64,42 @@ export default function Header({ locale = 'en', doctor }) {
   };
 
   const menu = [
-    { href: `/${locale}`, label: t(locale, 'nav.home'), match: (p) => p === `/${locale}` },
+    { href: `/${locale}`, label: t(locale, 'nav.home'), icon: 'shield', match: (p) => p === `/${locale}` },
     {
       href: `/${locale}/about`,
       label: t(locale, 'nav.about'),
+      icon: 'user',
       match: (p) => p.startsWith(`/${locale}/about`),
     },
     {
       href: `/${locale}/specialities`,
       label: t(locale, 'nav.specialities'),
+      icon: 'joint',
       match: (p) => p.startsWith(`/${locale}/specialities`),
     },
     {
       href: `/${locale}/services`,
       label: t(locale, 'nav.services'),
+      icon: 'spark',
       match: (p) => p.startsWith(`/${locale}/services`),
     },
     {
       href: `/${locale}/chambers`,
       label: t(locale, 'nav.chambers'),
+      icon: 'map',
       match: (p) => p.startsWith(`/${locale}/chambers`),
     },
     {
       href: `/${locale}/patient-education`,
       label: t(locale, 'nav.education'),
+      icon: 'info',
       match: (p) =>
         p.startsWith(`/${locale}/patient-education`) || p.startsWith(`/${locale}/downloads`),
     },
     {
       href: `/${locale}/contact`,
       label: t(locale, 'nav.contact'),
+      icon: 'mail',
       match: (p) => p.startsWith(`/${locale}/contact`),
     },
   ];
@@ -221,111 +230,137 @@ export default function Header({ locale = 'en', doctor }) {
               aria-hidden="true"
             />
 
-            {/* Off-Canvas Drawer (Slide-Over from Right) */}
+            {/* Off-Canvas Drawer (Slide-Over from Right, spanning 100% full height) */}
             <aside
               id="mobile-offcanvas-menu"
-              className={`fixed top-0 right-0 bottom-0 z-[101] h-screen h-[100dvh] w-[85vw] max-w-[340px] bg-paper border-l border-line/80 shadow-2xl flex flex-col justify-between transition-transform duration-300 ease-out ${
+              className={`fixed top-0 bottom-0 right-0 z-[101] h-full w-[86vw] max-w-[350px] bg-paper border-l border-line/80 shadow-2xl flex flex-col justify-between transition-transform duration-300 ease-out ${
                 open ? 'translate-x-0' : 'translate-x-full'
               }`}
               role="dialog"
               aria-modal="true"
               aria-label={t(locale, 'nav.main')}
             >
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between border-b border-line/70 px-4 py-3.5 bg-white/70">
-                <Link
-                  href={`/${locale}`}
-                  prefetch={true}
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-2.5 no-underline"
-                >
-                  <LogoMark className="size-9" theme="light" />
-                  <div className="flex flex-col">
-                    <span className="font-display text-sm font-bold leading-tight text-ink">
-                      {doctorName}
+              {/* Drawer Top Container */}
+              <div className="flex flex-col flex-1 overflow-hidden">
+                {/* Drawer Header */}
+                <div className="flex items-center justify-between border-b border-line/70 px-4 py-3.5 bg-white/80 shrink-0">
+                  <Link
+                    href={`/${locale}`}
+                    prefetch={true}
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-2.5 no-underline"
+                  >
+                    <LogoMark className="size-9" theme="light" />
+                    <div className="flex flex-col">
+                      <span className="font-display text-sm font-bold leading-tight text-ink">
+                        {doctorName}
+                      </span>
+                      <span className="text-[10px] font-medium text-ink-soft line-clamp-1">
+                        {specialtyLine}
+                      </span>
+                    </div>
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    className="flex size-9 items-center justify-center rounded-full bg-paper-alt text-ink-soft hover:bg-white hover:text-ink border border-line/70 transition-colors cursor-pointer"
+                    aria-label={t(locale, 'nav.close_menu')}
+                  >
+                    <SiteIcon name="close" className="size-4" />
+                  </button>
+                </div>
+
+                {/* Drawer Language Switcher Bar */}
+                <div className="px-4 pt-3 pb-2 border-b border-line/50 bg-paper-alt/30 shrink-0">
+                  <div className="flex items-center justify-between rounded-xl bg-white/90 p-1 border border-line/70 text-xs">
+                    <span className="text-[11px] font-semibold text-ink-soft px-2">
+                      {isBn ? 'ভাষা নির্বাচন' : 'Language'}
                     </span>
-                    <span className="text-[10px] font-medium text-ink-soft line-clamp-1">
-                      {specialtyLine}
-                    </span>
+                    <div className="flex items-center gap-1">
+                      <Link
+                        href={switchUrl('en')}
+                        prefetch={true}
+                        onClick={() => setOpen(false)}
+                        className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${
+                          !isBn ? 'bg-teal text-white shadow-2xs' : 'text-ink-soft hover:text-ink'
+                        }`}
+                      >
+                        EN
+                      </Link>
+                      <Link
+                        href={switchUrl('bn')}
+                        prefetch={true}
+                        onClick={() => setOpen(false)}
+                        className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${
+                          isBn ? 'bg-teal text-white shadow-2xs' : 'text-ink-soft hover:text-ink'
+                        }`}
+                      >
+                        বাংলা
+                      </Link>
+                    </div>
                   </div>
-                </Link>
+                </div>
 
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="flex size-8.5 items-center justify-center rounded-full bg-paper-alt text-ink-soft hover:bg-white hover:text-ink border border-line/70 transition-colors cursor-pointer"
-                  aria-label={t(locale, 'nav.close_menu')}
-                >
-                  <SiteIcon name="close" className="size-4" />
-                </button>
-              </div>
+                {/* Drawer Scrollable Area (Links + Chamber info) */}
+                <div className="flex-1 overflow-y-auto px-3.5 py-3 space-y-3">
+                  {/* Navigation Links */}
+                  <nav className="space-y-1">
+                    {menu.map((item) => {
+                      const active = item.match(pathname);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          prefetch={true}
+                          onClick={() => setOpen(false)}
+                          className={`flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold no-underline transition-all ${
+                            active
+                              ? 'bg-teal text-white shadow-xs'
+                              : 'text-ink hover:bg-white hover:text-teal'
+                          }`}
+                          aria-current={active ? 'page' : undefined}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            {item.icon && (
+                              <SiteIcon
+                                name={item.icon}
+                                className={`size-4 ${active ? 'text-white' : 'text-teal'}`}
+                              />
+                            )}
+                            <span>{item.label}</span>
+                          </div>
+                          {active ? (
+                            <span className="size-1.5 rounded-full bg-white" />
+                          ) : (
+                            <SiteIcon name="arrow" className="size-3.5 opacity-40 text-ink-soft" />
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </nav>
 
-              {/* Drawer Language Switcher Bar */}
-              <div className="px-4 pt-3 pb-2 border-b border-line/50 bg-paper-alt/30">
-                <div className="flex items-center justify-between rounded-xl bg-white/90 p-1 border border-line/70 text-xs">
-                  <span className="text-[11px] font-semibold text-ink-soft px-2">
-                    {isBn ? 'ভাষা নির্বাচন' : 'Language'}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <Link
-                      href={switchUrl('en')}
-                      prefetch={true}
-                      onClick={() => setOpen(false)}
-                      className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${
-                        !isBn ? 'bg-teal text-white shadow-2xs' : 'text-ink-soft hover:text-ink'
-                      }`}
-                    >
-                      EN
-                    </Link>
-                    <Link
-                      href={switchUrl('bn')}
-                      prefetch={true}
-                      onClick={() => setOpen(false)}
-                      className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${
-                        isBn ? 'bg-teal text-white shadow-2xs' : 'text-ink-soft hover:text-ink'
-                      }`}
-                    >
-                      বাংলা
-                    </Link>
+                  {/* Chamber Visiting Hours Brief */}
+                  <div className="rounded-2xl bg-paper-alt/80 border border-line/70 p-3 text-xs">
+                    <div className="flex items-center gap-1.5 font-bold text-ink mb-1">
+                      <SiteIcon name="clock" className="size-3.5 text-teal" />
+                      <span>{isBn ? 'চেম্বার সময়সূচী' : 'Chamber Schedule'}</span>
+                    </div>
+                    <p className="text-[11px] text-ink-soft leading-relaxed">
+                      <strong className="text-ink">Dhaka:</strong> JBFH Dhanmondi (Sat–Wed, 7–10 PM)<br/>
+                      <strong className="text-ink">Cumilla:</strong> Ibn Sina D.Lab (Friday)
+                    </p>
                   </div>
                 </div>
               </div>
 
-              {/* Drawer Scrollable Navigation Links */}
-              <nav className="flex-1 overflow-y-auto px-3.5 py-3 space-y-1">
-                {menu.map((item) => {
-                  const active = item.match(pathname);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      prefetch={true}
-                      onClick={() => setOpen(false)}
-                      className={`flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold no-underline transition-all ${
-                        active
-                          ? 'bg-teal text-white shadow-xs'
-                          : 'text-ink hover:bg-white hover:text-teal'
-                      }`}
-                      aria-current={active ? 'page' : undefined}
-                    >
-                      <span>{item.label}</span>
-                      {active ? (
-                        <span className="size-1.5 rounded-full bg-white" />
-                      ) : (
-                        <SiteIcon name="arrow" className="size-3.5 opacity-40 text-ink-soft" />
-                      )}
-                    </Link>
-                  );
-                })}
-              </nav>
-
               {/* Drawer Bottom Actions: Appointment CTA & Chamber Helpline */}
-              <div className="border-t border-line/70 bg-white/80 p-3.5 space-y-2">
+              <div className="border-t border-line/70 bg-white/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-2 shrink-0 shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
                 <Link
                   href={`/${locale}/appointment`}
                   prefetch={true}
                   onClick={() => setOpen(false)}
-                  className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-accent-deep text-white text-xs sm:text-sm font-bold shadow-xs hover:bg-[#8f4518] active:scale-[0.98] transition-all no-underline"
+                  className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-accent-deep text-white text-xs sm:text-sm font-bold shadow-xs hover:bg-[#8f4518] active:scale-[0.98] transition-all no-underline"
                 >
                   <SiteIcon name="calendar" className="size-4" />
                   <span>{t(locale, 'nav.request_appointment')}</span>
@@ -333,7 +368,7 @@ export default function Header({ locale = 'en', doctor }) {
 
                 <a
                   href="tel:01711647877"
-                  className="flex h-9 w-full items-center justify-center gap-1.5 rounded-xl border border-line/80 bg-paper-alt/70 text-ink hover:bg-white text-xs font-bold transition-all no-underline"
+                  className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-line/80 bg-paper-alt/70 text-ink hover:bg-white text-xs font-bold transition-all no-underline"
                 >
                   <SiteIcon name="phone" className="size-3.5 text-teal" />
                   <span>
