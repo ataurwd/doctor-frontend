@@ -67,7 +67,7 @@ export default function Header({ locale = 'en', doctor }) {
     <header className="sticky top-0 z-40 border-b border-line/70 bg-paper/90 backdrop-blur-md transition-all">
       <div className="container-site flex h-20 items-center justify-between gap-4">
         {/* Brand */}
-        <Link href={`/${locale}`} className="flex items-center gap-3 no-underline shrink-0 active:scale-[0.98] transition-transform">
+        <Link href={`/${locale}`} prefetch={true} className="flex items-center gap-3 no-underline shrink-0 active:scale-[0.98] transition-transform">
           <LogoMark className="size-11" theme="light" />
           <div className="flex flex-col">
             <span className="font-display text-lg font-bold leading-tight tracking-tight text-ink sm:text-xl">
@@ -88,6 +88,7 @@ export default function Header({ locale = 'en', doctor }) {
                 <li key={item.href} className="shrink-0">
                   <Link
                     href={item.href}
+                    prefetch={true}
                     className={`flex h-9 items-center rounded-full px-3 xl:px-4 text-xs xl:text-sm font-semibold whitespace-nowrap no-underline transition-all duration-150 active:scale-[0.98] ${
                       active
                         ? 'bg-teal text-white shadow-xs'
@@ -154,6 +155,7 @@ export default function Header({ locale = 'en', doctor }) {
 
           <Link
             href={`/${locale}/appointment`}
+            prefetch={true}
             className="btn btn-accent hidden sm:inline-flex text-xs xl:text-sm h-10 px-4.5"
           >
             {t(locale, 'nav.request_appointment')}
@@ -188,6 +190,7 @@ export default function Header({ locale = 'en', doctor }) {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    prefetch={true}
                     onClick={() => setOpen(false)}
                     className={`flex min-h-12 items-center rounded-2xl px-5 text-base font-semibold no-underline transition-colors ${
                       active ? 'bg-teal text-white shadow-xs' : 'text-ink hover:bg-paper-alt'
@@ -202,6 +205,7 @@ export default function Header({ locale = 'en', doctor }) {
             <li className="pt-3">
               <Link
                 href={`/${locale}/appointment`}
+                prefetch={true}
                 onClick={() => setOpen(false)}
                 className="btn btn-accent w-full"
               >

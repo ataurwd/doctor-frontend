@@ -5,9 +5,66 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 const API_SECRET = process.env.API_SECRET_KEY || 'sajib-api-shield-9f4a8b1c7e2d6305a4f78e1b52a1c0de';
 const CLIENT_TOKEN = process.env.NEXT_PUBLIC_APP_CLIENT_TOKEN || 'sajib-client-handshake-2026';
 
-// In-memory response cache with 60s TTL for blazing fast language switching and zero-latency navigations
+// In-memory response cache with 10-minute TTL for instant sub-millisecond route transitions
 const memoryCache = new Map();
-const CACHE_TTL_MS = 60 * 1000;
+const CACHE_TTL_MS = 10 * 60 * 1000;
+
+function warmCacheFromBootstrap(data) {
+  if (!data) return;
+  const now = Date.now();
+  memoryCache.set('/bootstrap', { data, timestamp: now });
+
+  if (Array.isArray(data.specialities)) {
+    memoryCache.set('/specialities', { data: data.specialities, timestamp: now });
+    data.specialities.forEach((item) => {
+      if (item?.slug) {
+        const others = data.specialities
+          .filter((s) => s.slug !== item.slug)
+          .slice(0, 3)
+          .map((s) => ({ slug: s.slug, title: s.title, summary: s.summary }));
+        memoryCache.set(`/specialities/${item.slug}`, { data: { item, others }, timestamp: now });
+      }
+    });
+  }
+
+  if (Array.isArray(data.specialServices)) {
+    memoryCache.set('/services', { data: data.specialServices, timestamp: now });
+    data.specialServices.forEach((item) => {
+      if (item?.slug) {
+        const others = data.specialServices
+          .filter((s) => s.slug !== item.slug)
+          .slice(0, 3)
+          .map((s) => ({ slug: s.slug, title: s.title, summary: s.summary }));
+        memoryCache.set(`/services/${item.slug}`, { data: { item, others }, timestamp: now });
+      }
+    });
+  }
+
+  if (Array.isArray(data.chambers)) {
+    memoryCache.set('/chambers', { data: data.chambers, timestamp: now });
+  }
+
+  const posts = data.allPosts || data.latestPosts;
+  if (Array.isArray(posts)) {
+    memoryCache.set('/patient-education', {
+      data: {
+        posts,
+        categories: data.categories || [],
+        handouts: data.handouts || [],
+      },
+      timestamp: now,
+    });
+    posts.forEach((item) => {
+      if (item?.slug) {
+        const related = posts.filter((p) => p.slug !== item.slug).slice(0, 2);
+        memoryCache.set(`/patient-education/${item.slug}`, {
+          data: { item, related, categories: data.categories || [] },
+          timestamp: now,
+        });
+      }
+    });
+  }
+}
 
 function getFallbackForEndpoint(endpoint) {
   const clean = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
@@ -94,7 +151,11 @@ export async function fetchApi(endpoint, options = {}) {
     if (res.ok) {
       const data = await res.json();
       if (isGet && data) {
-        memoryCache.set(cleanEndpoint, { data, timestamp: Date.now() });
+        if (cleanEndpoint === '/bootstrap') {
+          warmCacheFromBootstrap(data);
+        } else {
+          memoryCache.set(cleanEndpoint, { data, timestamp: Date.now() });
+        }
       }
       return data;
     }

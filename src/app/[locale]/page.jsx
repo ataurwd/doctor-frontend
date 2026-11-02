@@ -233,7 +233,7 @@ export default async function HomePage({ params }) {
                 <SiteIcon name="phone" /> {t(locale, 'buttons.call_to_book')}
               </a>
             )}
-            <Link href={`/${locale}/chambers`} className="btn btn-secondary">
+            <Link href={`/${locale}/chambers`} prefetch={true} className="btn btn-secondary">
               <SiteIcon name="clock" /> {t(locale, 'buttons.see_hours')}
             </Link>
           </div>
@@ -342,6 +342,7 @@ export default async function HomePage({ params }) {
 
                   <Link
                     href={card.href}
+                    prefetch={true}
                     aria-label={card.title}
                     className="flex size-10 sm:size-11 items-center justify-center rounded-full bg-paper-alt/80 border border-line/60 text-ink-soft transition-all duration-300 group-hover:bg-teal group-hover:text-white group-hover:border-teal group-hover:scale-105 shadow-2xs"
                   >
@@ -351,7 +352,7 @@ export default async function HomePage({ params }) {
 
                 {/* Title */}
                 <h3 className="mt-6 text-xl sm:text-2xl font-bold tracking-tight text-ink transition-colors duration-200 group-hover:text-teal leading-snug">
-                  <Link href={card.href} className="no-underline hover:no-underline focus:outline-none">
+                  <Link href={card.href} prefetch={true} className="no-underline hover:no-underline focus:outline-none">
                     {card.title}
                   </Link>
                 </h3>
@@ -373,6 +374,7 @@ export default async function HomePage({ params }) {
               <div className="mt-8 border-t border-line/60 pt-5 flex items-center justify-between">
                 <Link
                   href={card.href}
+                  prefetch={true}
                   className="inline-flex items-center gap-1.5 text-sm sm:text-base font-bold text-teal transition-all group-hover:text-teal-deep group-hover:gap-2.5"
                 >
                   <span>{isBn ? 'বিস্তারিত দেখুন' : 'Learn more'}</span>

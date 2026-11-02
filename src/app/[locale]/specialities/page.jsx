@@ -43,6 +43,7 @@ export default async function SpecialitiesIndexPage({ params }) {
                 <h2 className="mt-3 text-xl sm:text-2xl font-semibold tracking-[-0.02em]">
                   <Link
                     href={`/${locale}/specialities/${item.slug}`}
+                    prefetch={true}
                     className="inline-flex min-h-11 items-center text-ink no-underline hover:text-teal"
                   >
                     {tr(item, 'title', locale)}
@@ -51,6 +52,7 @@ export default async function SpecialitiesIndexPage({ params }) {
                 <p className="mt-3 text-base sm:text-lg text-ink-soft leading-relaxed">{tr(item, 'summary', locale)}</p>
                 <Link
                   href={`/${locale}/specialities/${item.slug}`}
+                  prefetch={true}
                   className="mt-auto inline-flex min-h-11 items-center gap-2 pt-6 font-semibold text-teal hover:text-teal-deep active:scale-[0.98] transition-transform"
                 >
                   {t(locale, 'buttons.learn_more')}

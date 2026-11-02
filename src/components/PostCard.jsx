@@ -59,6 +59,7 @@ export default function PostCard({ post, locale = 'en', headingTag = 'h3' }) {
         <Heading className="mt-3 text-xl font-bold tracking-tight text-ink group-hover:text-teal transition-colors">
           <Link
             href={`/${locale}/patient-education/${post.slug}`}
+            prefetch={true}
             className="text-ink no-underline group-hover:text-teal"
           >
             {title}
@@ -69,6 +70,7 @@ export default function PostCard({ post, locale = 'en', headingTag = 'h3' }) {
 
         <Link
           href={`/${locale}/patient-education/${post.slug}`}
+          prefetch={true}
           className="mt-auto inline-flex min-h-10 items-center gap-2 pt-6 text-sm font-bold text-teal transition-colors hover:text-teal-deep active:scale-[0.98]"
         >
           {t(locale, 'buttons.read_more')}
