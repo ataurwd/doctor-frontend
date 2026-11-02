@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MobileBar from '@/components/MobileBar';
-import NavigationProgressBar from '@/components/NavigationProgressBar';
 import { getBootstrapData } from '@/lib/api';
 import { t } from '@/i18n/translations';
 
@@ -20,9 +19,6 @@ export default async function LocaleLayout({ children, params }) {
 
   return (
     <div lang={locale} className="min-h-screen pb-24 md:pb-0 flex flex-col">
-      <Suspense fallback={null}>
-        <NavigationProgressBar />
-      </Suspense>
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-3"
