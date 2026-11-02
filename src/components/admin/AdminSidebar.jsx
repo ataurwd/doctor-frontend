@@ -102,3 +102,4 @@ export default function AdminSidebar({ mobileOpen = false, setMobileOpen = () =>
     </aside>
   );
 }
+

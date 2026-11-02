@@ -6,3 +6,4 @@ import { RESOURCE_SCHEMAS } from '@/components/admin/adminSchemas';
 export default function AdminDoctorsPage() {
   return <ResourceList schema={RESOURCE_SCHEMAS.doctors} />;
 }
+

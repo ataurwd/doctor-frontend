@@ -61,3 +61,4 @@ export default function AdminHeader({ title = 'Dashboard', mobileOpen, setMobile
     </>
   );
 }
+
