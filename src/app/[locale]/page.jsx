@@ -195,11 +195,27 @@ export default async function HomePage({ params }) {
             <span>{t(locale, 'home.eyebrow')}</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-[-0.04em] text-ink leading-[1.04]">
-            {name}
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-[-0.04em] text-ink leading-[1.06]">
+            {isBn ? (
+              name.includes('কামরুল হাসান সজীব') ? (
+                <>
+                  <span className="block">ডা: মো: কামরুল</span>
+                  <span className="block">হাসান সজীব</span>
+                </>
+              ) : (
+                name
+              )
+            ) : name.includes('Kamrul Hasan Sajib') ? (
+              <>
+                <span className="block">Dr. Md. Kamrul</span>
+                <span className="block">Hasan Sajib</span>
+              </>
+            ) : (
+              name
+            )}
           </h1>
           {otherName && otherName !== name && (
-            <p className="mt-2.5 font-display text-xl sm:text-2xl font-bold text-ink-soft/90" lang={otherLocale}>
+            <p className="mt-2.5 font-display text-xl sm:text-2xl font-bold text-ink-soft/90 font-bangla" lang={otherLocale}>
               {otherName}
             </p>
           )}
