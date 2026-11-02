@@ -18,7 +18,7 @@ export default async function LocaleLayout({ children, params }) {
   const settings = data?.settings || {};
 
   return (
-    <div lang={locale} className="min-h-screen pb-24 md:pb-0 flex flex-col">
+    <div lang={locale} className="min-h-screen pb-18 md:pb-0 flex flex-col">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-3"
