@@ -117,6 +117,7 @@ export default function Header({ locale = 'en', doctor }) {
                   href={switchUrl('en')}
                   hrefLang="en"
                   lang="en"
+                  prefetch={true}
                   className="flex h-8 items-center justify-center rounded-full px-2.5 font-semibold text-ink-soft no-underline transition-colors hover:text-teal active:scale-[0.98]"
                   data-lang-switch="en"
                 >
@@ -142,6 +143,7 @@ export default function Header({ locale = 'en', doctor }) {
                   href={switchUrl('bn')}
                   hrefLang="bn"
                   lang="bn"
+                  prefetch={true}
                   className="flex h-8 items-center justify-center rounded-full px-2.5 font-semibold text-ink-soft no-underline transition-colors hover:text-teal active:scale-[0.98]"
                   data-lang-switch="bn"
                 >

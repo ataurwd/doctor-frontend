@@ -1,8 +1,13 @@
+import { cache } from 'react';
 import fallbackData from '../data/fallbackData.js';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 const API_SECRET = process.env.API_SECRET_KEY || 'sajib-api-shield-9f4a8b1c7e2d6305a4f78e1b52a1c0de';
 const CLIENT_TOKEN = process.env.NEXT_PUBLIC_APP_CLIENT_TOKEN || 'sajib-client-handshake-2026';
+
+// In-memory response cache with 60s TTL for blazing fast language switching and zero-latency navigations
+const memoryCache = new Map();
+const CACHE_TTL_MS = 60 * 1000;
 
 function getFallbackForEndpoint(endpoint) {
   const clean = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
@@ -56,11 +61,21 @@ function getFallbackForEndpoint(endpoint) {
 
 export async function fetchApi(endpoint, options = {}) {
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const isGet = !options.method || options.method.toUpperCase() === 'GET';
+
+  // Check in-memory cache for GET requests to achieve sub-millisecond response times
+  if (isGet) {
+    const cached = memoryCache.get(cleanEndpoint);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return cached.data;
+    }
+  }
+
   const url = `${API_BASE}${cleanEndpoint}`;
 
   try {
     const res = await fetch(url, {
-      cache: 'no-store',
+      next: { revalidate: 60 },
       ...options,
       headers: {
         'x-api-secret': API_SECRET,
@@ -71,7 +86,11 @@ export async function fetchApi(endpoint, options = {}) {
     });
 
     if (res.ok) {
-      return await res.json();
+      const data = await res.json();
+      if (isGet && data) {
+        memoryCache.set(cleanEndpoint, { data, timestamp: Date.now() });
+      }
+      return data;
     }
 
     if (res.status === 404) {
@@ -87,7 +106,7 @@ export async function fetchApi(endpoint, options = {}) {
   return getFallbackForEndpoint(cleanEndpoint);
 }
 
-export async function getBootstrapData() {
+export const getBootstrapData = cache(async () => {
   try {
     const data = await fetchApi('/bootstrap');
     if (data && data.doctor) return data;
@@ -95,7 +114,7 @@ export async function getBootstrapData() {
     console.warn('[API Warning] getBootstrapData fallback triggered:', e.message);
   }
   return fallbackData;
-}
+});
 
 function escapeHtml(str) {
   return String(str ?? '')
