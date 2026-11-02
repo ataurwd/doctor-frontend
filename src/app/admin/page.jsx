@@ -160,6 +160,7 @@ export default function AdminPanelPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const [statusFilter, setStatusFilter] = useState('all');
+  const [viewMode, setViewMode] = useState('grid');
   const [editingItem, setEditingItem] = useState(null);
   const [settingsForm, setSettingsForm] = useState({});
   const [toast, setToast] = useState('');
@@ -1438,89 +1439,328 @@ export default function AdminPanelPage() {
                       </div>
                     </form>
                   ) : (
-                    /* LIST ITEMS VIEW */
-                    <div className="space-y-4">
-                      {/* Search Bar */}
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          placeholder={`Search ${currentSchema.label.toLowerCase()}...`}
-                          className="w-full rounded-2xl border border-line bg-white pl-11 pr-4 py-3 text-sm text-ink shadow-2xs focus:border-teal outline-none"
-                        />
-                        <div className="absolute left-4 top-3.5 text-ink-soft/60">
-                          <SiteIcon name="search" className="size-4" />
+                    /* LIST ITEMS VIEW (Cards & Data Table) */
+                    <div className="space-y-6">
+                      {/* Search Bar + View Mode Toggle + Counter */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="relative flex-1">
+                          <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder={`Search ${currentSchema.label.toLowerCase()}...`}
+                            className="w-full rounded-2xl border border-line bg-white pl-11 pr-4 py-2.5 text-sm text-ink shadow-2xs focus:border-teal outline-none transition-all"
+                          />
+                          <div className="absolute left-4 top-3 text-ink-soft/60">
+                            <SiteIcon name="search" className="size-4" />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 self-end sm:self-auto shrink-0">
+                          <span className="text-xs font-semibold text-ink-soft">
+                            {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'}
+                          </span>
+
+                          {/* Toggle: Cards vs Table */}
+                          <div className="flex items-center rounded-2xl border border-line bg-white p-1 shadow-2xs">
+                            <button
+                              type="button"
+                              onClick={() => setViewMode('grid')}
+                              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                                viewMode === 'grid'
+                                  ? 'bg-teal text-white shadow-xs'
+                                  : 'text-ink-soft hover:bg-paper-alt hover:text-ink'
+                              }`}
+                              title="Grid Cards View"
+                            >
+                              <SiteIcon name="spark" className="size-3.5" />
+                              <span>Cards</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setViewMode('table')}
+                              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                                viewMode === 'table'
+                                  ? 'bg-teal text-white shadow-xs'
+                                  : 'text-ink-soft hover:bg-paper-alt hover:text-ink'
+                              }`}
+                              title="Data Table View"
+                            >
+                              <SiteIcon name="menu" className="size-3.5" />
+                              <span>Table</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Items Cards */}
+                      {/* Empty State */}
                       {filteredItems.length === 0 ? (
                         <div className="rounded-3xl border border-line/80 bg-white p-12 text-center text-ink-soft">
-                          <p className="font-semibold text-ink">No items found.</p>
-                          <p className="text-xs text-ink-soft mt-1">Try adjusting your search query or click Add New.</p>
+                          <div className="flex size-12 items-center justify-center rounded-2xl bg-paper-alt mx-auto text-ink-soft/50 mb-3">
+                            <SiteIcon name="search" className="size-6" />
+                          </div>
+                          <p className="font-bold text-ink text-base">No items found.</p>
+                          <p className="text-xs text-ink-soft mt-1">Try adjusting your search query or add a new record.</p>
+                        </div>
+                      ) : viewMode === 'grid' ? (
+                        /* VIEW 1: RESPONSIVE GRID CARDS */
+                        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+                          {filteredItems.map((item, idx) => {
+                            const titleObj = item.title || item.name || item.question || {};
+                            const enTitle = titleObj.en || item.slug || item._id;
+                            const bnTitle = titleObj.bn || '';
+                            const note = item.review_note || item.verify_note;
+                            const publicUrl =
+                              activeSection === 'specialities'
+                                ? `/en/specialities/${item.slug}`
+                                : activeSection === 'special-services'
+                                ? `/en/services/${item.slug}`
+                                : activeSection === 'posts'
+                                ? `/en/patient-education/${item.slug}`
+                                : activeSection === 'chambers'
+                                ? `/en/chambers`
+                                : activeSection === 'faqs'
+                                ? `/en/contact`
+                                : null;
+
+                            return (
+                              <div
+                                key={item._id}
+                                className="group rounded-3xl border border-line/80 bg-white p-6 shadow-[0_2px_16px_rgba(27,46,42,0.03)] hover:shadow-lg hover:border-teal/30 transition-all flex flex-col justify-between"
+                              >
+                                <div>
+                                  {/* Card Header: Icon + Badges */}
+                                  <div className="flex items-center justify-between gap-2 pb-4 border-b border-line/50">
+                                    <div className="flex items-center gap-2">
+                                      <div className="flex size-9 items-center justify-center rounded-xl bg-teal/10 text-teal">
+                                        <SiteIcon name={currentSchema.icon} className="size-4.5" />
+                                      </div>
+                                      <span className="text-xs font-mono font-bold text-ink-soft/70">
+                                        #{item.sort_order ?? idx + 1}
+                                      </span>
+                                    </div>
+
+                                    <div className="flex items-center gap-1.5">
+                                      {item.is_active === false && (
+                                        <span className="rounded-full bg-paper-alt px-2.5 py-0.5 text-[10px] font-bold text-ink-soft">
+                                          Hidden
+                                        </span>
+                                      )}
+                                      {item.is_published === false ? (
+                                        <span className="rounded-full bg-amber-100 text-amber-900 border border-amber-200 px-2.5 py-0.5 text-[10px] font-bold">
+                                          Draft
+                                        </span>
+                                      ) : (
+                                        <span className="rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-bold">
+                                          Published
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Titles */}
+                                  <div className="mt-4">
+                                    <h3 className="text-lg font-black text-ink group-hover:text-teal transition-colors leading-tight">
+                                      {enTitle}
+                                    </h3>
+                                    {bnTitle && (
+                                      <p className="text-base font-semibold text-teal font-bangla mt-1" lang="bn">
+                                        {bnTitle}
+                                      </p>
+                                    )}
+                                  </div>
+
+                                  {/* Slug Badge */}
+                                  {item.slug && (
+                                    <div className="mt-3">
+                                      <span className="inline-block font-mono text-xs font-medium text-teal bg-paper-alt px-2.5 py-1 rounded-lg">
+                                        /{item.slug}
+                                      </span>
+                                    </div>
+                                  )}
+
+                                  {/* Chamber specific details */}
+                                  {item.phone_primary && (
+                                    <p className="mt-3 text-xs text-ink font-mono font-bold flex items-center gap-1.5">
+                                      <SiteIcon name="phone" className="size-3.5 text-teal" />
+                                      <span>{item.phone_primary}</span>
+                                    </p>
+                                  )}
+                                  {item.hours_text?.en && (
+                                    <p className="mt-1 text-xs text-ink-soft line-clamp-1">
+                                      🕒 {item.hours_text.en}
+                                    </p>
+                                  )}
+
+                                  {/* Summary Snippet */}
+                                  {item.summary?.en && (
+                                    <p className="mt-3 text-xs text-ink-soft line-clamp-2 leading-relaxed">
+                                      {item.summary.en}
+                                    </p>
+                                  )}
+
+                                  {/* Internal Review Note */}
+                                  {note && (
+                                    <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 p-2.5 text-xs font-semibold text-amber-800 flex items-start gap-2">
+                                      <SiteIcon name="alert" className="size-3.5 shrink-0 mt-0.5 text-amber-600" />
+                                      <span className="line-clamp-2">{note}</span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Card Footer: Actions */}
+                                <div className="mt-6 pt-4 border-t border-line/60 flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => setEditingItem(item)}
+                                      className="rounded-xl bg-teal px-4 py-2 text-xs font-bold text-white hover:bg-teal-deep transition-all cursor-pointer shadow-2xs inline-flex items-center gap-1.5"
+                                    >
+                                      <span>Edit (EN / বাংলা)</span>
+                                    </button>
+
+                                    {publicUrl && (
+                                      <Link
+                                        href={publicUrl}
+                                        target="_blank"
+                                        className="rounded-xl border border-line bg-paper-alt/60 p-2 text-ink-soft hover:text-teal hover:border-teal transition-all cursor-pointer"
+                                        title="View Public Page"
+                                      >
+                                        <SiteIcon name="arrow-up-right" className="size-3.5" />
+                                      </Link>
+                                    )}
+                                  </div>
+
+                                  {activeSection !== 'doctors' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteResource(item._id)}
+                                      className="rounded-xl p-2 text-ink-soft/70 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer"
+                                      title="Delete Record"
+                                    >
+                                      <SiteIcon name="close" className="size-3.5" />
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       ) : (
-                        filteredItems.map((item) => {
-                          const titleObj = item.title || item.name || item.question || {};
-                          const enTitle = titleObj.en || item.slug || item._id;
-                          const bnTitle = titleObj.bn || '';
-                          const note = item.review_note || item.verify_note;
+                        /* VIEW 2: DATA TABLE */
+                        <div className="rounded-3xl border border-line/80 bg-white overflow-hidden shadow-sm">
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse text-sm">
+                              <thead>
+                                <tr className="border-b border-line bg-paper-alt/50 text-xs font-bold uppercase tracking-wider text-ink-soft/75">
+                                  <th className="py-4 px-6 w-16">#</th>
+                                  <th className="py-4 px-6">Title (English + বাংলা)</th>
+                                  <th className="py-4 px-6">Route / Slug</th>
+                                  <th className="py-4 px-6">Status</th>
+                                  <th className="py-4 px-6">Admin Note</th>
+                                  <th className="py-4 px-6 text-right">Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-line/50">
+                                {filteredItems.map((item, idx) => {
+                                  const titleObj = item.title || item.name || item.question || {};
+                                  const enTitle = titleObj.en || item.slug || item._id;
+                                  const bnTitle = titleObj.bn || '';
+                                  const note = item.review_note || item.verify_note;
+                                  const publicUrl =
+                                    activeSection === 'specialities'
+                                      ? `/en/specialities/${item.slug}`
+                                      : activeSection === 'special-services'
+                                      ? `/en/services/${item.slug}`
+                                      : activeSection === 'posts'
+                                      ? `/en/patient-education/${item.slug}`
+                                      : activeSection === 'chambers'
+                                      ? `/en/chambers`
+                                      : activeSection === 'faqs'
+                                      ? `/en/contact`
+                                      : null;
 
-                          return (
-                            <div
-                              key={item._id}
-                              className="rounded-3xl border border-line/80 bg-white p-5 sm:p-6 shadow-[0_2px_15px_rgba(27,46,42,0.03)] hover:shadow-md hover:border-teal/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                            >
-                              <div className="flex-1 min-w-0 pr-4">
-                                <h3 className="text-lg font-bold text-ink">{enTitle}</h3>
-                                {bnTitle && (
-                                  <p className="text-sm text-ink-soft font-bangla mt-0.5" lang="bn">
-                                    {bnTitle}
-                                  </p>
-                                )}
-                                {item.slug && (
-                                  <p className="text-xs font-mono text-teal mt-1">/{item.slug}</p>
-                                )}
-                                {note && (
-                                  <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-semibold text-amber-800">
-                                    <SiteIcon name="alert" className="size-3.5 shrink-0" />
-                                    <span>{note}</span>
-                                  </p>
-                                )}
-                              </div>
-
-                              <div className="flex items-center gap-2 shrink-0">
-                                {item.is_active === false && (
-                                  <span className="rounded-full bg-paper-alt px-2.5 py-1 text-xs font-bold text-ink-soft">
-                                    Hidden
-                                  </span>
-                                )}
-                                {item.is_published === false && (
-                                  <span className="rounded-full bg-amber-100 text-amber-900 px-2.5 py-1 text-xs font-bold">
-                                    Draft
-                                  </span>
-                                )}
-                                <button
-                                  type="button"
-                                  onClick={() => setEditingItem(item)}
-                                  className="rounded-xl bg-teal px-4 py-2 text-xs font-bold text-white hover:bg-teal-deep transition-all cursor-pointer shadow-2xs"
-                                >
-                                  Edit (EN / বাংলা)
-                                </button>
-                                {activeSection !== 'doctors' && (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteResource(item._id)}
-                                    className="rounded-xl border border-line px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 hover:border-red-200 transition-all cursor-pointer"
-                                  >
-                                    Delete
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })
+                                  return (
+                                    <tr key={item._id} className="hover:bg-paper-alt/30 transition-colors">
+                                      <td className="py-4 px-6 font-mono font-bold text-ink-soft/70">
+                                        #{item.sort_order ?? idx + 1}
+                                      </td>
+                                      <td className="py-4 px-6">
+                                        <p className="font-bold text-ink text-base">{enTitle}</p>
+                                        {bnTitle && (
+                                          <p className="text-sm font-semibold text-teal font-bangla mt-0.5" lang="bn">
+                                            {bnTitle}
+                                          </p>
+                                        )}
+                                      </td>
+                                      <td className="py-4 px-6">
+                                        {item.slug ? (
+                                          <span className="font-mono text-xs text-teal bg-paper-alt px-2.5 py-1 rounded-lg">
+                                            /{item.slug}
+                                          </span>
+                                        ) : (
+                                          <span className="text-xs text-ink-soft">—</span>
+                                        )}
+                                      </td>
+                                      <td className="py-4 px-6">
+                                        {item.is_published === false ? (
+                                          <span className="inline-flex rounded-full bg-amber-100 text-amber-900 border border-amber-200 px-2.5 py-1 text-xs font-bold">
+                                            Draft
+                                          </span>
+                                        ) : (
+                                          <span className="inline-flex rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 text-xs font-bold">
+                                            Published
+                                          </span>
+                                        )}
+                                      </td>
+                                      <td className="py-4 px-6 text-xs text-ink-soft max-w-xs">
+                                        {note ? (
+                                          <span className="inline-flex items-center gap-1 text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg">
+                                            <SiteIcon name="alert" className="size-3 shrink-0 text-amber-600" />
+                                            <span className="truncate">{note}</span>
+                                          </span>
+                                        ) : (
+                                          '—'
+                                        )}
+                                      </td>
+                                      <td className="py-4 px-6 text-right">
+                                        <div className="inline-flex items-center gap-2">
+                                          <button
+                                            type="button"
+                                            onClick={() => setEditingItem(item)}
+                                            className="rounded-xl bg-teal px-3.5 py-1.5 text-xs font-bold text-white hover:bg-teal-deep transition-all cursor-pointer shadow-2xs"
+                                          >
+                                            Edit
+                                          </button>
+                                          {publicUrl && (
+                                            <Link
+                                              href={publicUrl}
+                                              target="_blank"
+                                              className="rounded-xl border border-line p-1.5 text-ink-soft hover:text-teal transition-all cursor-pointer"
+                                              title="View Public Page"
+                                            >
+                                              <SiteIcon name="arrow-up-right" className="size-3.5" />
+                                            </Link>
+                                          )}
+                                          {activeSection !== 'doctors' && (
+                                            <button
+                                              type="button"
+                                              onClick={() => handleDeleteResource(item._id)}
+                                              className="rounded-xl border border-line px-2.5 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50 hover:border-red-200 transition-all cursor-pointer"
+                                            >
+                                              Delete
+                                            </button>
+                                          )}
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
                       )}
                     </div>
                   )}
