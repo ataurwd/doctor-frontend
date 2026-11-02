@@ -93,19 +93,22 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 rounded-xl bg-paper-alt/80 border border-line/70 p-3 text-xs text-ink-soft">
+        <div className="mt-6 rounded-xl bg-paper-alt/80 border border-line/70 p-3.5 text-xs text-ink-soft">
           <p className="font-bold text-ink">Testing Credentials:</p>
-          <div className="mt-1 flex items-center justify-between font-mono text-[11px]">
-            <span>admin@example.com</span>
+          <div className="mt-1.5 flex items-center justify-between font-mono text-[11px]">
+            <div>
+              <p><span className="text-ink-soft">Email:</span> <span className="text-teal font-semibold">admin@example.com</span></p>
+              <p><span className="text-ink-soft">Pass:</span> <span className="text-teal font-semibold">admin123456</span></p>
+            </div>
             <button
               type="button"
               onClick={() => {
                 setEmail('admin@example.com');
                 setPassword('admin123456');
               }}
-              className="rounded-lg bg-teal/10 px-2 py-0.5 text-xs font-bold text-teal hover:bg-teal hover:text-white transition-all cursor-pointer"
+              className="rounded-lg bg-teal/10 px-2.5 py-1 text-xs font-bold text-teal hover:bg-teal hover:text-white transition-all cursor-pointer border border-teal/20"
             >
-              Fill Demo Password
+              Fill Credentials
             </button>
           </div>
         </div>

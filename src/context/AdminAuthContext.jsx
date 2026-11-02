@@ -25,11 +25,13 @@ export function AdminAuthProvider({ children }) {
   const fetchWithAuth = useCallback(
     async (endpoint, options = {}) => {
       const clean = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-      const url = `${API_BASE}${clean}`;
+      const adminPath = clean.startsWith('/admin') ? clean : `/admin${clean}`;
+      const url = `${API_BASE}${adminPath}`;
       const currentToken = token || (typeof window !== 'undefined' ? localStorage.getItem('dr_sajib_admin_token') : '');
 
       const headers = {
         'Content-Type': 'application/json',
+        'x-app-client': process.env.NEXT_PUBLIC_APP_CLIENT_TOKEN || 'sajib-client-handshake-2026',
         ...(currentToken ? { Authorization: `Bearer ${currentToken}` } : {}),
         ...(options.headers || {}),
       };
@@ -61,7 +63,7 @@ export function AdminAuthProvider({ children }) {
     }
   }, [fetchWithAuth]);
 
-  // Check stored token and verify with /auth/me on mount
+  // Check stored token and verify with /admin/me on mount
   useEffect(() => {
     setMounted(true);
     const savedToken = localStorage.getItem('dr_sajib_admin_token');
@@ -77,19 +79,25 @@ export function AdminAuthProvider({ children }) {
     setToken(savedToken);
 
     // Verify session
-    fetch(`${API_BASE}/auth/me`, {
-      headers: { Authorization: `Bearer ${savedToken}` },
+    fetch(`${API_BASE}/admin/me`, {
+      headers: {
+        Authorization: `Bearer ${savedToken}`,
+        'x-app-client': process.env.NEXT_PUBLIC_APP_CLIENT_TOKEN || 'sajib-client-handshake-2026',
+      },
     })
       .then((res) => {
         if (res.ok) return res.json();
         throw new Error('Invalid token');
       })
       .then((userData) => {
-        setUser(userData);
+        setUser(userData.user || userData);
         setLoading(false);
         // Also fetch initial stats for sidebar badges
-        fetch(`${API_BASE}/stats`, {
-          headers: { Authorization: `Bearer ${savedToken}` },
+        fetch(`${API_BASE}/admin/stats`, {
+          headers: {
+            Authorization: `Bearer ${savedToken}`,
+            'x-app-client': process.env.NEXT_PUBLIC_APP_CLIENT_TOKEN || 'sajib-client-handshake-2026',
+          },
         })
           .then((r) => (r.ok ? r.json() : null))
           .then((st) => st && setStats(st))
@@ -108,15 +116,18 @@ export function AdminAuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
+      const res = await fetch(`${API_BASE}/admin/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-app-client': process.env.NEXT_PUBLIC_APP_CLIENT_TOKEN || 'sajib-client-handshake-2026',
+        },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        return { success: false, error: data.message || 'Login failed' };
+        return { success: false, error: data.error || data.message || 'Login failed' };
       }
 
       localStorage.setItem('dr_sajib_admin_token', data.token);

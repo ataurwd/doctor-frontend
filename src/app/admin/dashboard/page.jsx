@@ -49,7 +49,7 @@ export default function AdminDashboardPage() {
     {
       title: 'New Requests',
       value: stats?.newAppointments ?? 0,
-      sub: `${stats?.appointments ?? 0} total requests`,
+      sub: `${stats?.totalAppointments ?? stats?.appointments ?? 0} total requests`,
       icon: 'calendar',
       route: '/admin/appointments',
       color: 'teal',
@@ -57,14 +57,14 @@ export default function AdminDashboardPage() {
     {
       title: 'Messages',
       value: stats?.unreadMessages ?? 0,
-      sub: `${stats?.messages ?? 0} total messages`,
+      sub: `${stats?.totalMessages ?? stats?.messages ?? 0} total messages`,
       icon: 'mail',
       route: '/admin/messages',
       color: 'accent',
     },
     {
       title: 'Active Chambers',
-      value: stats?.chambers ?? 2,
+      value: stats?.activeChambers ?? stats?.chambers ?? 2,
       sub: 'Dhaka & Cumilla locations',
       icon: 'map',
       route: '/admin/chambers',
