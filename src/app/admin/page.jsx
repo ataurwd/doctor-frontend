@@ -757,7 +757,7 @@ export default function AdminPanelPage() {
         </header>
 
         {/* Content Container */}
-        <div className="flex-1 p-5 sm:p-8 lg:p-10 max-w-7xl w-full">
+        <div className="flex-1 p-5 sm:p-8 lg:p-10 w-full">
           {/* Error Banner with Retry */}
           {loadError && (
             <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm font-semibold text-red-800 flex items-center justify-between gap-4">
@@ -1472,7 +1472,7 @@ export default function AdminPanelPage() {
                               key={item._id}
                               className="rounded-3xl border border-line/80 bg-white p-5 sm:p-6 shadow-[0_2px_15px_rgba(27,46,42,0.03)] hover:shadow-md hover:border-teal/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                             >
-                              <div className="max-w-2xl">
+                              <div className="flex-1 min-w-0 pr-4">
                                 <h3 className="text-lg font-bold text-ink">{enTitle}</h3>
                                 {bnTitle && (
                                   <p className="text-sm text-ink-soft font-bangla mt-0.5" lang="bn">
