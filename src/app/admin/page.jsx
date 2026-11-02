@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import SiteIcon from '@/components/SiteIcon';
+import { LogoMark } from '@/components/Logo';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
@@ -467,10 +468,8 @@ export default function AdminPanelPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#133430] via-[#1b2e2a] to-[#0f2421] flex items-center justify-center p-4 font-sans text-ink">
         <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/95 p-8 sm:p-10 shadow-2xl backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <div className="flex size-11 items-center justify-center rounded-2xl bg-teal text-white shadow-md">
-              <SiteIcon name="shield" className="size-6" />
-            </div>
+          <div className="flex items-center gap-3.5">
+            <LogoMark className="size-12" theme="light" />
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-accent-deep">Management Portal</p>
               <h1 className="text-2xl font-black text-ink">Dr. Sajib Admin</h1>
@@ -641,9 +640,7 @@ export default function AdminPanelPage() {
       {/* MOBILE TOP BAR */}
       <div className="lg:hidden flex items-center justify-between bg-teal-deep text-white px-5 py-4 border-b border-white/10 sticky top-0 z-40">
         <div className="flex items-center gap-2.5">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-white/15 text-white">
-            <SiteIcon name="shield" className="size-5" />
-          </div>
+          <LogoMark className="size-9" theme="dark" />
           <div>
             <p className="font-extrabold text-sm leading-tight text-white">Dr. Sajib Admin</p>
             <p className="text-[11px] text-white/70">{user?.email}</p>
@@ -673,9 +670,7 @@ export default function AdminPanelPage() {
         {/* Top Header Card */}
         <div className="hidden lg:flex items-center justify-between pb-6 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-white/15 text-accent shadow-2xs">
-              <SiteIcon name="shield" className="size-5" />
-            </div>
+            <LogoMark className="size-10" theme="dark" />
             <div>
               <p className="font-extrabold text-base tracking-tight text-white">Dr. Sajib Admin</p>
               <p className="text-xs text-white/60 truncate max-w-[140px]">{user?.email}</p>

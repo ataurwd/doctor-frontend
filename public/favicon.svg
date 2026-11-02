@@ -1,1 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#1F4C46"/><text x="32" y="44" font-family="Georgia, serif" font-size="34" font-weight="700" text-anchor="middle" fill="#FBF8F2">S</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="16" fill="#133430"/>
+  <!-- Upper Joint Condyle & S-Curve (Bone 1 / Flexion) in Cyan-Mint -->
+  <path d="M21 25.5C21 19.1 26 14 32.5 14H34.5C41.4 14 47 19.6 47 26.5C47 31.8 43.4 35.8 37.5 37.5L26.5 40.8" stroke="#2DD4BF" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Lower Joint Condyle & S-Curve (Bone 2 / Extension) in Emerald-Mint -->
+  <path d="M43 38.5C43 44.9 38 50 31.5 50H29.5C22.6 50 17 44.4 17 37.5C17 32.2 20.6 28.2 26.5 26.5L37.5 23.2" stroke="#34D399" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Central Medical Cross (+) in Warm Terracotta Accent -->
+  <path d="M32 26.5V37.5M26.5 32H37.5" stroke="#E28A52" stroke-width="4" stroke-linecap="round"/>
+  <!-- Central Synovial Vitality Pearl / Pivot Point -->
+  <circle cx="32" cy="32" r="2.4" fill="#FBF8F2"/>
+</svg>

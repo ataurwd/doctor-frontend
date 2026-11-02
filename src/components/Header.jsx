@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import SiteIcon from './SiteIcon';
+import { LogoMark } from './Logo';
 import { t, tr } from '@/i18n/translations';
 
 export default function Header({ locale = 'en', doctor }) {
@@ -67,9 +68,7 @@ export default function Header({ locale = 'en', doctor }) {
       <div className="container-site flex h-20 items-center justify-between gap-4">
         {/* Brand */}
         <Link href={`/${locale}`} className="flex items-center gap-3 no-underline shrink-0 active:scale-[0.98] transition-transform">
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-teal text-white shadow-sm font-bold text-lg">
-            <SiteIcon name="check" className="size-5 text-accent" />
-          </div>
+          <LogoMark className="size-11" theme="light" />
           <div className="flex flex-col">
             <span className="font-display text-lg font-bold leading-tight tracking-tight text-ink sm:text-xl">
               {doctorName}

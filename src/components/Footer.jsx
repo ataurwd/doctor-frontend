@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import SiteIcon from './SiteIcon';
+import { LogoMark } from './Logo';
 import { t, tr, digits, telHref, settingLocalized } from '@/i18n/translations';
 
 export default function Footer({ locale = 'en', doctor, chambers = [], settings = {} }) {
@@ -25,10 +26,8 @@ export default function Footer({ locale = 'en', doctor, chambers = [], settings 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-10">
           {/* Column 1: Doctor Identity & CTA (span 4) */}
           <div className="lg:col-span-4">
-            <div className="flex items-center gap-2.5">
-              <span className="flex size-8 items-center justify-center rounded-lg bg-white/10 text-emerald-300">
-                <SiteIcon name="activity" className="size-4" />
-              </span>
+            <div className="flex items-center gap-3">
+              <LogoMark className="size-8" theme="dark" />
               <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-300/90">
                 {isBn ? 'রিউমাটোলজি বিশেষজ্ঞ' : 'Rheumatology Specialist'}
               </span>
