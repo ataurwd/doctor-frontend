@@ -9,6 +9,7 @@ export default function ResourceList({
   schema,
   customRender = null,
   headerAction = null,
+  defaultView = 'table', // 'table' | 'grid'
 }) {
   const { fetchWithAuth, showToast, refreshStats } = useAdminAuth();
 
@@ -16,6 +17,7 @@ export default function ResourceList({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState(defaultView);
   const [editingItem, setEditingItem] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -111,8 +113,37 @@ export default function ResourceList({
           <p className="text-xs sm:text-sm text-ink-soft">{schema.description}</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* View Toggle (Cards vs Table) */}
+          <div className="flex items-center gap-1 rounded-xl bg-paper-alt p-1 border border-line shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setViewMode('table')}
+              className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                viewMode === 'table'
+                  ? 'bg-teal text-white shadow-2xs'
+                  : 'text-ink-soft hover:text-ink'
+              }`}
+            >
+              <SiteIcon name="menu" className="size-3" />
+              <span>Table</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                viewMode === 'grid'
+                  ? 'bg-teal text-white shadow-2xs'
+                  : 'text-ink-soft hover:text-ink'
+              }`}
+            >
+              <SiteIcon name="spark" className="size-3" />
+              <span>Cards</span>
+            </button>
+          </div>
+
           {headerAction}
+
           <button
             type="button"
             onClick={() => setEditingItem({})}
@@ -124,28 +155,33 @@ export default function ResourceList({
         </div>
       </div>
 
-      {/* Search Input */}
-      <div className="relative">
-        <SiteIcon
-          name="search"
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-ink-soft/60"
-        />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={`Search ${schema.label.toLowerCase()}...`}
-          className="w-full rounded-2xl border border-line/80 bg-white pl-10 pr-4 py-2.5 text-xs sm:text-sm text-ink placeholder:text-ink-soft/50 focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20 transition-all shadow-2xs"
-        />
-        {searchQuery && (
-          <button
-            type="button"
-            onClick={() => setSearchQuery('')}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-soft hover:text-ink"
-          >
-            Clear
-          </button>
-        )}
+      {/* Search Input & Item Counter */}
+      <div className="flex flex-col sm:flex-row items-center gap-3">
+        <div className="relative flex-1 w-full">
+          <SiteIcon
+            name="search"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-ink-soft/60"
+          />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={`Search ${schema.label.toLowerCase()} by English / বাংলা title or slug...`}
+            className="w-full rounded-2xl border border-line/80 bg-white pl-10 pr-12 py-2.5 text-xs sm:text-sm text-ink placeholder:text-ink-soft/50 focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20 transition-all shadow-2xs"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-soft hover:text-ink"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        <span className="text-xs font-bold text-ink-soft bg-paper-alt px-3 py-2 rounded-xl border border-line whitespace-nowrap">
+          {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'}
+        </span>
       </div>
 
       {/* Error Banner */}
@@ -162,7 +198,7 @@ export default function ResourceList({
         </div>
       )}
 
-      {/* Custom renderer or standard cards list */}
+      {/* Custom renderer or standard cards/table list */}
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -183,6 +219,7 @@ export default function ResourceList({
           onEdit: setEditingItem,
           onDelete: handleDelete,
           refresh: loadItems,
+          viewMode,
         })
       ) : filteredItems.length === 0 ? (
         <div className="rounded-3xl border border-dashed border-line bg-paper-alt/40 p-12 text-center space-y-3">
@@ -193,63 +230,178 @@ export default function ResourceList({
               : `Click "Add New ${schema.label}" above to create your first entry.`}
           </p>
         </div>
+      ) : viewMode === 'table' ? (
+        /* ================= EXECUTIVE DATA TABLE ================= */
+        <div className="rounded-3xl border border-line/80 bg-white shadow-xs overflow-hidden">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full min-w-[950px] text-left text-xs">
+              <thead>
+                <tr className="border-b border-line/60 bg-paper-alt/40 text-[11px] font-bold text-ink-soft uppercase tracking-wider">
+                  <th className="py-3.5 px-5 w-12 text-center">#</th>
+                  <th className="py-3.5 px-5 min-w-[260px]">English + বাংলা Title</th>
+                  <th className="py-3.5 px-5 min-w-[180px]">Route / Slug</th>
+                  <th className="py-3.5 px-5 w-28">Status</th>
+                  <th className="py-3.5 px-5 min-w-[240px]">Admin Note / Review</th>
+                  <th className="py-3.5 px-6 text-right min-w-[140px] whitespace-nowrap">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line/40">
+                {filteredItems.map((item, idx) => {
+                  const enTitle = item.title?.en || item.name?.en || item.question?.en || 'Untitled';
+                  const bnTitle = item.title?.bn || item.name?.bn || item.question?.bn || '';
+                  const slug = item.slug || item.category_slug || '';
+                  const reviewNote = item.review_note || item.verify_note || '';
+
+                  return (
+                    <tr key={item._id || idx} className="hover:bg-paper-alt/25 transition-colors group">
+                      <td className="py-4 px-5 text-center font-mono text-[11px] text-ink-soft/70">
+                        {idx + 1}
+                      </td>
+
+                      <td className="py-4 px-5">
+                        <p className="font-bold text-ink text-sm leading-snug group-hover:text-teal transition-colors">
+                          {enTitle}
+                        </p>
+                        {bnTitle ? (
+                          <p className="text-xs text-ink-soft font-bangla mt-0.5 line-clamp-1">
+                            {bnTitle}
+                          </p>
+                        ) : (
+                          <span className="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-medium mt-0.5 inline-block">
+                            Bangla translation needed
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="py-4 px-5">
+                        {slug ? (
+                          <span className="font-mono text-xs text-teal bg-paper-alt px-2.5 py-1 rounded-lg inline-block border border-line/60">
+                            /{slug}
+                          </span>
+                        ) : (
+                          <span className="text-ink-soft/50 text-xs">-</span>
+                        )}
+                      </td>
+
+                      <td className="py-4 px-5 whitespace-nowrap">
+                        <span
+                          className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                            item.is_published !== false && item.is_active !== false
+                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                              : 'bg-amber-50 text-amber-800 border border-amber-200'
+                          }`}
+                        >
+                          {item.is_published !== false && item.is_active !== false ? 'Published' : 'Draft'}
+                        </span>
+                      </td>
+
+                      <td className="py-4 px-5">
+                        {reviewNote ? (
+                          <div
+                            className="text-[11px] text-amber-900 bg-amber-50/80 border border-amber-200/70 rounded-xl px-2.5 py-1.5 max-w-xs truncate"
+                            title={reviewNote}
+                          >
+                            <span className="font-semibold text-amber-700">Note: </span>
+                            {reviewNote}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-ink-soft/40 italic">No notes</span>
+                        )}
+                      </td>
+
+                      <td className="py-4 px-6 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setEditingItem(item)}
+                            className="rounded-lg bg-paper-alt hover:bg-teal hover:text-white px-3 py-1.5 text-xs font-bold text-teal transition-all cursor-pointer shadow-2xs border border-line/60"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(item._id, enTitle)}
+                            className="rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700 px-2 py-1.5 text-xs font-bold transition-colors cursor-pointer"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        /* ================= CARDS GRID ================= */
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filteredItems.map((item, idx) => {
             const enTitle = item.title?.en || item.name?.en || item.question?.en || 'Untitled';
             const bnTitle = item.title?.bn || item.name?.bn || item.question?.bn || '';
             const summary = item.summary?.en || item.address?.en || item.excerpt?.en || item.answer?.en || '';
+            const reviewNote = item.review_note || item.verify_note || '';
 
             return (
               <div
                 key={item._id || idx}
-                className="group relative rounded-2xl border border-line/80 bg-white p-5 shadow-2xs hover:shadow-md hover:border-teal/30 transition-all flex flex-col justify-between"
+                className="group relative rounded-3xl border border-line/80 bg-white p-6 shadow-2xs hover:shadow-md hover:border-teal/30 transition-all flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start justify-between gap-2 pb-3 border-b border-line/50">
                     <span className="font-mono text-[10px] font-bold text-ink-soft/70 bg-paper-alt px-2 py-0.5 rounded-md">
                       #{idx + 1}
                     </span>
-                    {item.is_published !== undefined && (
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                          item.is_published
-                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                            : 'bg-amber-50 text-amber-800 border border-amber-200'
-                        }`}
-                      >
-                        {item.is_published ? 'Published' : 'Draft'}
-                      </span>
-                    )}
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                        item.is_published !== false && item.is_active !== false
+                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                          : 'bg-amber-50 text-amber-800 border border-amber-200'
+                      }`}
+                    >
+                      {item.is_published !== false && item.is_active !== false ? 'Published' : 'Draft'}
+                    </span>
                   </div>
 
-                  <h3 className="mt-2.5 font-bold text-ink text-base line-clamp-2 group-hover:text-teal transition-colors">
+                  <h3 className="mt-3 font-bold text-ink text-base line-clamp-2 group-hover:text-teal transition-colors">
                     {enTitle}
                   </h3>
-                  {bnTitle && (
-                    <p className="mt-0.5 text-xs text-ink-soft font-bangla line-clamp-1">
+                  {bnTitle ? (
+                    <p className="mt-1 text-xs text-ink-soft font-bangla line-clamp-1">
                       {bnTitle}
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-medium inline-block">
+                      Bangla translation needed
                     </p>
                   )}
 
                   {item.slug && (
-                    <p className="mt-1 text-[11px] font-mono text-teal/80 line-clamp-1">
+                    <p className="mt-2 text-[11px] font-mono text-teal bg-paper-alt px-2 py-0.5 rounded-md inline-block">
                       /{item.slug}
                     </p>
                   )}
 
                   {summary && (
-                    <p className="mt-2.5 text-xs text-ink-soft line-clamp-2 leading-relaxed">
+                    <p className="mt-3 text-xs text-ink-soft line-clamp-2 leading-relaxed">
                       {summary}
                     </p>
                   )}
+
+                  {reviewNote && (
+                    <div className="mt-3 rounded-xl bg-amber-50/80 border border-amber-200/70 p-2.5 text-[11px] text-amber-900 line-clamp-2">
+                      <span className="font-semibold text-amber-700">Note: </span>
+                      {reviewNote}
+                    </div>
+                  )}
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between">
+                <div className="mt-5 pt-3 border-t border-line/60 flex items-center justify-between">
                   <button
                     type="button"
                     onClick={() => setEditingItem(item)}
-                    className="rounded-lg bg-paper-alt px-3 py-1.5 text-xs font-bold text-teal hover:bg-teal hover:text-white transition-all cursor-pointer"
+                    className="rounded-lg bg-paper-alt px-3 py-1.5 text-xs font-bold text-teal hover:bg-teal hover:text-white transition-all cursor-pointer border border-line/60"
                   >
                     Edit (EN / বাংলা)
                   </button>
@@ -280,4 +432,3 @@ export default function ResourceList({
     </div>
   );
 }
-
