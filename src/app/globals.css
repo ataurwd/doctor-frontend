@@ -1,0 +1,339 @@
+@import 'tailwindcss';
+
+/* Self-hosted modern fonts in public/fonts */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url(/fonts/plus-jakarta-sans-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url(/fonts/plus-jakarta-sans-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* Li Ador Bangla / Li Ador Noirrit (Lipighor) font */
+@font-face {
+  font-family: 'Li Ador Bangla';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/Li-Ador-Bangla.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Li Ador Noirrit';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/Li-Ador-Bangla.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Li Ador Noirrit Unicode';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/Li-Ador-Bangla.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Hind Siliguri';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/hind-siliguri-400.woff2) format('woff2');
+  unicode-range: U+0951-0952, U+0964-0965, U+0980-09FE, U+1CD0, U+1CD2, U+1CD5-1CD6, U+1CD8, U+1CE1, U+1CEA, U+1CED, U+1CF2, U+1CF5-1CF7, U+200C-200D, U+20B9, U+25CC, U+A8F1, U+11DF0-11DF1;
+}
+@font-face {
+  font-family: 'Hind Siliguri';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/fonts/hind-siliguri-500.woff2) format('woff2');
+  unicode-range: U+0951-0952, U+0964-0965, U+0980-09FE, U+1CD0, U+1CD2, U+1CD5-1CD6, U+1CD8, U+1CE1, U+1CEA, U+1CED, U+1CF2, U+1CF5-1CF7, U+200C-200D, U+20B9, U+25CC, U+A8F1, U+11DF0-11DF1;
+}
+@font-face {
+  font-family: 'Hind Siliguri';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/fonts/hind-siliguri-600.woff2) format('woff2');
+  unicode-range: U+0951-0952, U+0964-0965, U+0980-09FE, U+1CD0, U+1CD2, U+1CD5-1CD6, U+1CD8, U+1CE1, U+1CEA, U+1CED, U+1CF2, U+1CF5-1CF7, U+200C-200D, U+20B9, U+25CC, U+A8F1, U+11DF0-11DF1;
+}
+@font-face {
+  font-family: 'Hind Siliguri';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/fonts/hind-siliguri-700.woff2) format('woff2');
+  unicode-range: U+0951-0952, U+0964-0965, U+0980-09FE, U+1CD0, U+1CD2, U+1CD5-1CD6, U+1CD8, U+1CE1, U+1CEA, U+1CED, U+1CF2, U+1CF5-1CF7, U+200C-200D, U+20B9, U+25CC, U+A8F1, U+11DF0-11DF1;
+}
+@font-face {
+  font-family: 'Noto Sans Bengali';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url(/fonts/noto-sans-bengali-400.woff2) format('woff2');
+  unicode-range: U+0951-0952, U+0964-0965, U+0980-09FE, U+1CD0, U+1CD2, U+1CD5-1CD6, U+1CD8, U+1CE1, U+1CEA, U+1CED, U+1CF2, U+1CF5-1CF7, U+200C-200D, U+20B9, U+25CC, U+A8F1;
+}
+@font-face {
+  font-family: 'Noto Sans Bengali';
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url(/fonts/noto-sans-bengali-600.woff2) format('woff2');
+  unicode-range: U+0951-0952, U+0964-0965, U+0980-09FE, U+1CD0, U+1CD2, U+1CD5-1CD6, U+1CD8, U+1CE1, U+1CEA, U+1CED, U+1CF2, U+1CF5-1CF7, U+200C-200D, U+20B9, U+25CC, U+A8F1;
+}
+
+:root {
+  --site-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --site-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+[lang='bn'],
+:lang(bn) {
+  --site-body: 'Li Ador Bangla', 'Li Ador Noirrit', 'Li Ador Noirrit Unicode', 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  --site-display: 'Li Ador Bangla', 'Li Ador Noirrit', 'Li Ador Noirrit Unicode', 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  font-family: 'Li Ador Bangla', 'Li Ador Noirrit', 'Li Ador Noirrit Unicode', 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  font-synthesis: weight;
+}
+
+[lang='bn'],
+[lang='bn'] *,
+:lang(bn),
+:lang(bn) * {
+  font-family: 'Li Ador Bangla', 'Li Ador Noirrit', 'Li Ador Noirrit Unicode', 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+}
+
+@theme {
+  --font-sans: var(--site-body);
+  --font-display: var(--site-display);
+
+  --color-ink: #1b2e2a;
+  --color-ink-soft: #4c5d58;
+  --color-paper: #fbf8f2;
+  --color-paper-alt: #f1ece0;
+  --color-line: #e1d9c6;
+  --color-teal: #1f4c46;
+  --color-teal-deep: #133430;
+  --color-accent: #c1652f;
+  --color-accent-deep: #a3521f;
+
+  --radius-card: 20px;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 6rem;
+  }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+    font-size: 1.125rem;
+    line-height: 1.7;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display text-ink;
+    line-height: 1.1;
+    font-weight: 600;
+  }
+  h1 {
+    letter-spacing: -0.04em;
+  }
+  h2 {
+    letter-spacing: -0.035em;
+  }
+  h3 {
+    letter-spacing: -0.025em;
+  }
+  h4 {
+    letter-spacing: -0.015em;
+  }
+  :lang(bn) h1, :lang(bn) h2, :lang(bn) h3, :lang(bn) h4,
+  [lang='bn'] h1, [lang='bn'] h2, [lang='bn'] h3, [lang='bn'] h4,
+  :lang(bn) [class*='tracking-'],
+  [lang='bn'] [class*='tracking-'] {
+    letter-spacing: normal !important;
+  }
+  :lang(bn) h1, :lang(bn) h2, :lang(bn) h3, :lang(bn) h4,
+  [lang='bn'] h1, [lang='bn'] h2, [lang='bn'] h3, [lang='bn'] h4 {
+    line-height: 1.35 !important;
+  }
+  a {
+    @apply text-teal underline-offset-4;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  img {
+    height: auto;
+  }
+}
+
+@layer components {
+  .container-site {
+    @apply mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8 xl:px-10;
+  }
+  .section-rhythm {
+    @apply py-14 sm:py-20 lg:py-24;
+  }
+  .eyebrow {
+    @apply text-xs sm:text-sm font-semibold uppercase tracking-[0.08em] text-accent-deep;
+  }
+  :lang(bn) .eyebrow {
+    @apply normal-case tracking-normal text-sm font-semibold;
+  }
+
+  /* Display & Headline tokens matching Design.md */
+  .display-xxl {
+    font-size: clamp(2.75rem, 6vw, 5.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+    font-weight: 600;
+  }
+  .display-xl {
+    font-size: clamp(2.25rem, 4.5vw, 4.25rem);
+    line-height: 0.96;
+    letter-spacing: -0.045em;
+    font-weight: 600;
+  }
+  .display-lg {
+    font-size: clamp(1.75rem, 3.2vw, 3rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    font-weight: 600;
+  }
+  .display-md {
+    font-size: clamp(1.35rem, 2vw, 1.875rem);
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+  }
+  :lang(bn) .display-xxl,
+  :lang(bn) .display-xl,
+  :lang(bn) .display-lg,
+  :lang(bn) .display-md {
+    letter-spacing: normal;
+    line-height: 1.35;
+  }
+
+  .card {
+    @apply rounded-[24px] border border-line/70 bg-white p-6 sm:p-8 shadow-[0_4px_24px_rgba(27,46,42,0.04)] transition-all duration-300 hover:shadow-[0_16px_36px_rgba(27,46,42,0.08)] hover:-translate-y-1;
+  }
+  .card-spotlight {
+    @apply relative overflow-hidden rounded-[28px] sm:rounded-[36px] border border-teal/20 bg-gradient-to-br from-teal via-teal-deep to-[#0c2420] p-8 text-white shadow-[0_16px_48px_rgba(19,52,48,0.22)] sm:p-12;
+  }
+  .btn {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-2.5 text-sm sm:text-base font-semibold no-underline transition-all duration-150 ease-out cursor-pointer active:scale-[0.98] select-none;
+  }
+  .btn-primary {
+    @apply bg-teal text-white shadow-xs hover:bg-teal-deep hover:shadow-md;
+  }
+  .btn-accent {
+    @apply bg-accent-deep text-white shadow-xs hover:bg-[#8f4518] hover:shadow-md;
+  }
+  .btn-outline {
+    @apply border-2 border-teal bg-transparent text-teal hover:bg-teal hover:text-white;
+  }
+  .btn-secondary {
+    @apply border border-line/90 bg-white text-ink shadow-2xs hover:bg-paper-alt hover:border-line;
+  }
+  .btn-light {
+    @apply bg-white text-teal-deep shadow-xs hover:bg-paper-alt;
+  }
+  .btn-whatsapp {
+    @apply bg-[#1a7f4b] text-white shadow-xs hover:bg-[#13603a] hover:shadow-md;
+  }
+  .btn-icon-circular {
+    @apply inline-flex size-11 items-center justify-center rounded-full border border-line bg-white text-ink shadow-2xs transition-all duration-150 ease-out hover:bg-paper-alt active:scale-[0.98];
+  }
+  .pill {
+    @apply inline-flex min-h-10 items-center rounded-full border border-line/80 bg-white/90 px-4 py-1.5 text-sm font-medium text-teal-deep shadow-2xs transition-all hover:border-teal/50 hover:bg-white active:scale-[0.98];
+  }
+  .field-label {
+    @apply mb-2 block text-sm font-semibold tracking-wide text-ink uppercase;
+  }
+  :lang(bn) .field-label {
+    @apply normal-case tracking-normal text-base font-semibold;
+  }
+  .field {
+    @apply block min-h-12 w-full rounded-xl border border-line bg-white px-4 py-3 text-base text-ink placeholder:text-ink-soft/60 transition-all duration-150 focus:border-teal focus:ring-4 focus:ring-teal/10 focus:outline-none;
+  }
+  .field-error {
+    @apply mt-2 text-base font-medium text-[#a12a1f];
+  }
+  .notice-box {
+    @apply rounded-[20px] border-l-8 border-accent bg-paper-alt p-6;
+  }
+
+  .prose-site {
+    @apply max-w-none text-ink;
+  }
+  .prose-site > * + * {
+    margin-top: 1.1em;
+  }
+  .prose-site h2 {
+    @apply mt-10 text-2xl sm:text-3xl;
+  }
+  .prose-site h3 {
+    @apply mt-8 text-xl sm:text-2xl;
+  }
+  .prose-site ul {
+    @apply list-disc space-y-2 pl-6;
+  }
+  .prose-site ol {
+    @apply list-decimal space-y-2 pl-6;
+  }
+  .prose-site li::marker {
+    color: var(--color-accent);
+  }
+  .prose-site hr {
+    @apply my-10 border-line;
+  }
+  .prose-site em {
+    @apply text-ink-soft;
+  }
+  .prose-site a {
+    @apply underline;
+  }
+}
+
+@media print {
+  @page {
+    margin: 18mm;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 12pt;
+  }
+  .no-print,
+  header,
+  footer,
+  nav {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .card,
+  .notice-box {
+    border: 1px solid #999 !important;
+    background: #fff !important;
+  }
+  a {
+    color: #000 !important;
+    text-decoration: none !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+}
+.print-only {
+  display: none;
+}
+
